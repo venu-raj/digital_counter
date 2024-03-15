@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "741177209917",
+    "project_id": "digital-counter-ae71e",
+    "storage_bucket": "digital-counter-ae71e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741177209917:android:eff8e4d9bd2affbef42654",
+        "android_client_info": {
+          "package_name": "com.example.digital_counter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741177209917-jd80nt062hs68hav4vrlfmclhvfcoc42.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.digital_counter",
+            "certificate_hash": "9734d988f3b81c3d5261f9371af139f154278f96"
+          }
+        },
+        {
+          "client_id": "741177209917-udb89vqsg9h9q7dgainsitkp53d3nnsd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR8nrUp4jshJ_zPGpcM2neMAUVNM0jzek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741177209917-udb89vqsg9h9q7dgainsitkp53d3nnsd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "741177209917-sck1nfefmlg3ta110kphkm7832uk2pjp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.digitalCounter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
