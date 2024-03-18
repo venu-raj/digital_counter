@@ -45,7 +45,7 @@ android {
         applicationId "com.example.digital_counter"
         // You can update the following values to match your application needs.  AIzaSyBEqi4lhvkTjY0ejN2Xg1JxA8xCu_HD170
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -66,3 +66,4 @@ flutter {
 }
 
 dependencies {}
+

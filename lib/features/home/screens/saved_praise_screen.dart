@@ -1,6 +1,10 @@
-import 'package:digital_counter/common/loader.dart';
+import 'package:digital_counter/utils/common/loader.dart';
+import 'package:digital_counter/utils/common/utils.dart';
+import 'package:digital_counter/features/home/screens/add_praise_screen_2.dart';
 import 'package:digital_counter/networking/controller/praise_controller.dart';
-import 'package:digital_counter/home/screens/update_praise_screen.dart';
+import 'package:digital_counter/features/home/screens/update_praise_screen.dart';
+import 'package:digital_counter/utils/theme/app_theme.dart';
+import 'package:digital_counter/utils/theme/pallete.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,8 +20,11 @@ class SavedPraiseScreen extends ConsumerStatefulWidget {
 class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
   @override
   Widget build(BuildContext context) {
+    final currentTheme = ref.watch(themeNotifierProvider);
+
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text(
           "Prises",
           style: Theme.of(context).textTheme.titleLarge,
@@ -62,7 +69,7 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                           child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(15),
-                                color: Colors.black.withOpacity(0.05),
+                                color: currentTheme.cardColor,
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -82,7 +89,6 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                                               .titleMedium!
                                               .copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.black,
                                               ),
                                         ),
                                         Text(
@@ -90,14 +96,20 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleSmall!
-                                              .copyWith(color: Colors.grey),
+                                              .copyWith(
+                                                color: currentTheme.primaryColor
+                                                    .withOpacity(0.5),
+                                              ),
                                         ),
                                         Text(
                                           "For ${praise.relation}",
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleSmall!
-                                              .copyWith(color: Colors.grey),
+                                              .copyWith(
+                                                color: currentTheme.primaryColor
+                                                    .withOpacity(0.5),
+                                              ),
                                         ),
                                         Row(
                                           children: [
@@ -107,14 +119,22 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .titleSmall!
-                                                  .copyWith(color: Colors.grey),
+                                                  .copyWith(
+                                                    color: currentTheme
+                                                        .primaryColor
+                                                        .withOpacity(0.5),
+                                                  ),
                                             ),
                                             Text(
                                               " - ${DateFormat.Hm().format(praise.dateCreated)}",
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .titleSmall!
-                                                  .copyWith(color: Colors.grey),
+                                                  .copyWith(
+                                                    color: currentTheme
+                                                        .primaryColor
+                                                        .withOpacity(0.5),
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -125,9 +145,10 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                                         Container(
                                           width: 55,
                                           height: 55,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.green,
-                                            borderRadius: BorderRadius.all(
+                                          decoration: BoxDecoration(
+                                            color: currentTheme.splashColor,
+                                            borderRadius:
+                                                const BorderRadius.all(
                                               Radius.circular(50),
                                             ),
                                           ),
@@ -139,17 +160,32 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                                                   .bodySmall!
                                                   .copyWith(
                                                     fontWeight: FontWeight.w800,
-                                                    color: Colors.white,
                                                   ),
                                             ),
                                           ),
                                         ),
                                         IconButton(
                                           onPressed: () {
-                                            ref
-                                                .read(praiseControllerProvider
-                                                    .notifier)
-                                                .delectPraise(praise.id);
+                                            showAlertDialog(
+                                              context: context,
+                                              title:
+                                                  "Are you sure want to delect",
+                                              onTap1: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              button1Text: "No",
+                                              button2Text: "Yes",
+                                              textColor:
+                                                  currentTheme.primaryColor,
+                                              onTap2: () {
+                                                ref
+                                                    .read(
+                                                        praiseControllerProvider
+                                                            .notifier)
+                                                    .delectPraise(praise.id);
+                                                Navigator.of(context).pop();
+                                              },
+                                            );
                                           },
                                           icon:
                                               const Icon(CupertinoIcons.delete),
@@ -171,6 +207,22 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
         loading: () {
           return const Loader();
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: "btnnn",
+        backgroundColor: Pallete.greenColor,
+        foregroundColor: currentTheme.scaffoldBackgroundColor,
+        onPressed: () {
+          Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => const AddPraiseScreen2(),
+            ),
+          );
+        },
+        child: const Icon(
+          Icons.add,
+          color: Pallete.whiteColor,
+        ),
       ),
     );
   }

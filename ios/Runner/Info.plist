@@ -56,5 +56,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To Upload Photoes via Posts</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To Upload Photoes via Posts</string>
 </dict>
 </plist>

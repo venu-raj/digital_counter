@@ -1,10 +1,11 @@
-import 'package:digital_counter/home/screens/tabbar_screen.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:digital_counter/utils/common/custom_button.dart';
+import 'package:digital_counter/features/home/widgets/show_adaptive_dialog_for_prises.dart';
+import 'package:digital_counter/utils/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:digital_counter/common/utils.dart';
+import 'package:digital_counter/utils/common/utils.dart';
 import 'package:digital_counter/networking/controller/praise_controller.dart';
-import 'package:digital_counter/home/widgets/digital_number.dart';
+import 'package:digital_counter/features/home/widgets/digital_number.dart';
 
 class AddPraiseScreen extends ConsumerStatefulWidget {
   final String relation;
@@ -23,6 +24,12 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
   int value = 0;
   final namecontroller = TextEditingController();
 
+  @override
+  void dispose() {
+    namecontroller.dispose();
+    super.dispose();
+  }
+
   void saveUserData(id) {
     ref.watch(praiseControllerProvider.notifier).uploadPraiseToFirebase(
           name: namecontroller.text.trim(),
@@ -31,13 +38,14 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
           id: id,
           relation: widget.relation,
           amount: widget.amount,
+          ref: ref,
         );
-    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider)!;
+    final currentTheme = ref.watch(themeNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -45,13 +53,26 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
         child: Column(
           children: [
             const Spacer(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Target - ${widget.amount}",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(
+                  "To - ${widget.relation}",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.blueGrey.shade100,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -103,6 +124,7 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
                           Navigator.of(context).pop();
                         },
                         button1Text: "Cancel",
+                        textColor: currentTheme.primaryColor,
                         onTap2: () {
                           setState(() {
                             value = 0;
@@ -132,96 +154,40 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
                 ),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 15),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  showAdaptiveDialog(
-                    context: context,
-                    builder: (context) {
-                      return Scaffold(
-                        body: AlertDialog.adaptive(
-                          content: Column(
-                            children: [
-                              TextField(
-                                controller: namecontroller,
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter Name',
-                                ),
-                                maxLength: 15,
-                              ),
-                              Container(
-                                width: double.infinity,
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(color: Colors.black),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      widget.relation,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(color: Colors.black54),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                if (namecontroller.text.trim().isNotEmpty &&
-                                    value != 0) {
-                                  saveUserData(user.uid);
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      CupertinoPageRoute(
-                                        builder: (context) =>
-                                            const TabbarScreen(),
-                                      ),
-                                      (route) => false);
-                                } else {
-                                  showSnackBar(
-                                    context,
-                                    "Name must be provided and value must be greater than 1",
-                                  );
-                                }
-                              },
-                              child: const Text("Done"),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: CustomButton(
+                text: "Save",
+                currentTheme: currentTheme,
+                onpressed: () {
+                  if (value >= 1) {
+                    showAdaptiveDialogForPrises(
+                      context,
+                      user,
+                      namecontroller,
+                      widget.relation,
+                      () {
+                        if (namecontroller.text.trim().isNotEmpty) {
+                          saveUserData(user.uid);
+                        } else {
+                          showSnackBar(
+                            context,
+                            "Name should not be empty",
+                            ref,
+                          );
+                        }
+                      },
+                      currentTheme,
+                    );
+                  } else {
+                    showSnackBar(
+                      context,
+                      "The amount must be greater than or equal to 1",
+                      ref,
+                    );
+                  }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  fixedSize: Size(MediaQuery.of(context).size.width, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Text(
-                  "Save",
-                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                ),
               ),
             ),
             const Spacer(),
@@ -232,7 +198,7 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
   }
 }
 
-class DigitalNumberWidget extends StatelessWidget {
+class DigitalNumberWidget extends ConsumerWidget {
   final int value;
   const DigitalNumberWidget({
     super.key,
@@ -240,7 +206,9 @@ class DigitalNumberWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.watch(themeNotifierProvider);
+
     return Padding(
       padding: const EdgeInsets.all(4),
       child: Stack(
@@ -249,7 +217,7 @@ class DigitalNumberWidget extends StatelessWidget {
             key: GlobalKey(),
             value: value,
             height: 50,
-            color: Colors.black,
+            color: currentTheme.primaryColor,
           ),
           DigitalNumber(
             key: GlobalKey(),
@@ -269,7 +237,7 @@ class DigitalNumberWidget extends StatelessWidget {
   }
 }
 
-class DigitalNumberWidgetForEmpty extends StatelessWidget {
+class DigitalNumberWidgetForEmpty extends ConsumerWidget {
   final int value;
   const DigitalNumberWidgetForEmpty({
     super.key,
@@ -277,7 +245,9 @@ class DigitalNumberWidgetForEmpty extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.watch(themeNotifierProvider);
+
     return Padding(
       padding: const EdgeInsets.all(4),
       child: Stack(
@@ -286,7 +256,7 @@ class DigitalNumberWidgetForEmpty extends StatelessWidget {
             key: GlobalKey(),
             value: value,
             height: 50,
-            color: Colors.black.withOpacity(0.04),
+            color: currentTheme.primaryColor.withOpacity(0.04),
           ),
           DigitalNumber(
             key: GlobalKey(),
@@ -298,7 +268,7 @@ class DigitalNumberWidgetForEmpty extends StatelessWidget {
                         ? 888
                         : 8888,
             height: 50,
-            color: Colors.black.withOpacity(0.04),
+            color: currentTheme.primaryColor.withOpacity(0.04),
           ),
         ],
       ),

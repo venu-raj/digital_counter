@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_counter/models/user_model.dart';
-import 'package:digital_counter/auth/screens/otp_screen.dart';
+import 'package:digital_counter/features/auth/screens/otp_screen.dart';
+import 'package:digital_counter/networking/repository/storage_method.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:digital_counter/models/praise_model.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 final praiseRepositoryProvider = Provider<PraiseRepository>((ref) {
@@ -26,31 +28,27 @@ class PraiseRepository {
 
   Stream<User?> get authStateChange => auth.authStateChanges();
 
-  loginWithUser({
+  Future loginWithUser({
     required String phoneNumber,
     required BuildContext context,
   }) async {
-    try {
-      await auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await auth.signInWithCredential(credential);
-        },
-        verificationFailed: (e) {
-          throw Exception(e.message);
-        },
-        codeSent: ((String verificationId, int? resendToken) async {
-          Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => OTPScreen(verificationId: verificationId),
-            ),
-          );
-        }),
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } catch (e) {
-      return left(e.toString());
-    }
+    await auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await auth.signInWithCredential(credential);
+      },
+      verificationFailed: (e) {
+        throw Exception(e.message);
+      },
+      codeSent: ((String verificationId, int? resendToken) async {
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => OTPScreen(verificationId: verificationId),
+          ),
+        );
+      }),
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
   }
 
   Future<Either<String, PhoneAuthCredential>> verifyOTP({
@@ -79,6 +77,8 @@ class PraiseRepository {
         phoneNumber: auth.currentUser!.phoneNumber.toString(),
         uid: auth.currentUser!.uid,
         name: name,
+        profilePic:
+            "https://t3.ftcdn.net/jpg/03/64/62/36/360_F_364623623_ERzQYfO4HHHyawYkJ16tREsizLyvcaeg.jpg",
       );
 
       await firestore
@@ -94,7 +94,8 @@ class PraiseRepository {
 
   Stream<UserModel?> getUserData(String uid) {
     return firestore.collection('users').doc(uid).snapshots().map(
-        (event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
+          (event) => UserModel.fromMap(event.data() as Map<String, dynamic>),
+        );
   }
 
   Future<Either<String, PraiseModel>> uploadPraiseToFirebase({
@@ -126,17 +127,21 @@ class PraiseRepository {
   }
 
   Stream<List<PraiseModel>> getPraiseFromFirebase() {
-    return firestore
-        .collection("praises")
-        .where("uid", isEqualTo: auth.currentUser!.uid)
-        .snapshots()
-        .map(
-          (event) => event.docs
-              .map(
-                (e) => PraiseModel.fromMap(e.data()),
-              )
-              .toList(),
-        );
+    try {
+      return firestore
+          .collection("praises")
+          .where("uid", isEqualTo: auth.currentUser!.uid)
+          .snapshots()
+          .map(
+            (event) => event.docs
+                .map(
+                  (e) => PraiseModel.fromMap(e.data()),
+                )
+                .toList(),
+          );
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   Future<Either<String, void>> updatePraiseModel(
@@ -157,5 +162,48 @@ class PraiseRepository {
 
   Future<void> delectPraise(String id) async {
     await firestore.collection("praises").doc(id).delete();
+  }
+
+  void signOutUser() async {
+    await auth.signOut();
+  }
+
+  Future<Either<String, void>> updateUser(
+    String docId,
+    String? name,
+    XFile? profilePic,
+    WidgetRef ref,
+  ) async {
+    try {
+      final profilePicstorage =
+          await ref.watch(storageMethodsProvider).uploadImageToStorage(
+                "profilePic",
+                profilePic!,
+                false,
+              );
+      final res = await firestore.collection('users').doc(docId).update({
+        'name': name,
+        'profilePic': profilePicstorage,
+      });
+
+      return right(res);
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
+  Future<Either<String, void>> updateUserNameOnly(
+    String docId,
+    String? name,
+    WidgetRef ref,
+  ) async {
+    try {
+      final res =
+          await firestore.collection('users').doc(docId).update({'name': name});
+
+      return right(res);
+    } catch (e) {
+      return left(e.toString());
+    }
   }
 }

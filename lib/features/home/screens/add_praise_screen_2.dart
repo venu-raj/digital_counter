@@ -1,16 +1,20 @@
-import 'package:digital_counter/common/utils.dart';
-import 'package:digital_counter/home/screens/add_praise_screen.dart';
+import 'package:digital_counter/utils/common/custom_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:digital_counter/utils/common/utils.dart';
+import 'package:digital_counter/features/home/screens/add_praise_screen.dart';
+import 'package:digital_counter/utils/theme/app_theme.dart';
 
-class AddPraiseScreen2 extends StatefulWidget {
+class AddPraiseScreen2 extends ConsumerStatefulWidget {
   const AddPraiseScreen2({super.key});
 
   @override
-  State<AddPraiseScreen2> createState() => _AddPraiseScreen2State();
+  ConsumerState<AddPraiseScreen2> createState() => _AddPraiseScreen2State();
 }
 
-class _AddPraiseScreen2State extends State<AddPraiseScreen2> {
+class _AddPraiseScreen2State extends ConsumerState<AddPraiseScreen2> {
   String dropdownvalue = "Father";
   final amountController = TextEditingController();
   var items = [
@@ -19,11 +23,20 @@ class _AddPraiseScreen2State extends State<AddPraiseScreen2> {
     'Sister',
     'Brother',
     'Friends',
+    '+',
   ];
 
   @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final currentTheme = ref.watch(themeNotifierProvider);
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -34,6 +47,7 @@ class _AddPraiseScreen2State extends State<AddPraiseScreen2> {
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButton(
                 value: dropdownvalue,
@@ -58,37 +72,38 @@ class _AddPraiseScreen2State extends State<AddPraiseScreen2> {
                 width: MediaQuery.of(context).size.width * 0.40,
                 child: TextField(
                   controller: amountController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Enter Amount",
+                    focusColor: currentTheme.dividerColor,
+                    hoverColor: currentTheme.dividerColor,
                   ),
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
                   keyboardType: TextInputType.number,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 15),
-          ElevatedButton(
-            onPressed: () {
-              if (amountController.text.trim().isNotEmpty) {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    builder: (context) => AddPraiseScreen(
-                      relation: dropdownvalue,
-                      amount: amountController.text.trim(),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: CustomButton(
+              text: "CONTINUE",
+              currentTheme: currentTheme,
+              onpressed: () {
+                if (amountController.text.trim().isNotEmpty) {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => AddPraiseScreen(
+                        relation: dropdownvalue,
+                        amount: amountController.text.trim(),
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                showSnackBar(context, "Please enter valid amount");
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  );
+                } else {
+                  showSnackBar(context, "Please enter valid amount", ref);
+                }
+              },
             ),
-            child: const Text("CONTINUE"),
           ),
         ],
       ),

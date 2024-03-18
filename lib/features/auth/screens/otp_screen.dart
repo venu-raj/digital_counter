@@ -1,4 +1,4 @@
-import 'package:digital_counter/common/loader.dart';
+import 'package:digital_counter/utils/common/loader.dart';
 import 'package:digital_counter/networking/controller/praise_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +15,7 @@ class OTPScreen extends ConsumerWidget {
           context: context,
           verificationId: verificationId,
           userOTP: userOTP,
+          ref: ref,
         );
   }
 
@@ -27,10 +28,9 @@ class OTPScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Verifying your number'),
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: isLoading
-          ? const Loader()
+          ? const LoadingPage()
           : Center(
               child: Column(
                 children: [
