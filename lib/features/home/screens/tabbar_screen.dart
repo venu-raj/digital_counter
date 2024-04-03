@@ -1,13 +1,16 @@
-import 'package:digital_counter/features/profile/profile_screen.dart';
-import 'package:digital_counter/features/home/screens/saved_praise_screen.dart';
-import 'package:digital_counter/features/testimonis/screens/testimonis_feed_screen.dart';
-import 'package:digital_counter/utils/theme/app_theme.dart';
+import 'package:digital_counter/features/daily_verse/daily_verse_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:digital_counter/features/home/screens/saved_praise_screen.dart';
+import 'package:digital_counter/features/profile/profile_screen.dart';
+import 'package:digital_counter/features/testimonis/screens/testimonis_feed_screen.dart';
+import 'package:digital_counter/utils/theme/app_theme.dart';
 
 class TabbarScreen extends ConsumerStatefulWidget {
-  const TabbarScreen({super.key});
+  const TabbarScreen({
+    super.key,
+  });
 
   @override
   ConsumerState<TabbarScreen> createState() => _TabbarScreenState();
@@ -26,9 +29,7 @@ class _TabbarScreenState extends ConsumerState<TabbarScreen> {
         children: const [
           SavedPraiseScreen(),
           TestmonisFeedScreen(),
-          Center(
-            child: Text("notifications"),
-          ),
+          DailyVerseScreen(),
           ProfileScreen(),
         ],
       ),
@@ -68,11 +69,11 @@ class _TabbarScreenState extends ConsumerState<TabbarScreen> {
           BottomNavigationBarItem(
             icon: index == 2
                 ? Icon(
-                    Icons.notifications,
+                    Icons.menu_book_rounded,
                     color: currentTheme.primaryColor,
                   )
                 : Icon(
-                    Icons.notifications_outlined,
+                    Icons.menu_book_rounded,
                     color: currentTheme.dividerColor,
                   ),
           ),

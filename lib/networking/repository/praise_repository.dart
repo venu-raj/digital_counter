@@ -51,6 +51,16 @@ class PraiseRepository {
     );
   }
 
+  Future<Either<String, UserCredential>> signInAsGuest() async {
+    try {
+      final res = await auth.signInAnonymously();
+
+      return right(res);
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
   Future<Either<String, PhoneAuthCredential>> verifyOTP({
     required BuildContext context,
     required String verificationId,
@@ -78,7 +88,7 @@ class PraiseRepository {
         uid: auth.currentUser!.uid,
         name: name,
         profilePic:
-            "https://t3.ftcdn.net/jpg/03/64/62/36/360_F_364623623_ERzQYfO4HHHyawYkJ16tREsizLyvcaeg.jpg",
+            "https://firebasestorage.googleapis.com/v0/b/digital-counter-ae71e.appspot.com/o/default_profile_pic%2FScreenshot%201946-01-14%20at%2005.16.26.png?alt=media&token=3c93dead-b4c0-4930-98fa-e0e6cd69f636",
       );
 
       await firestore
@@ -92,8 +102,12 @@ class PraiseRepository {
     }
   }
 
-  Stream<UserModel?> getUserData(String uid) {
-    return firestore.collection('users').doc(uid).snapshots().map(
+  Stream<UserModel?> getUserData() {
+    return firestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .snapshots()
+        .map(
           (event) => UserModel.fromMap(event.data() as Map<String, dynamic>),
         );
   }
@@ -205,5 +219,16 @@ class PraiseRepository {
     } catch (e) {
       return left(e.toString());
     }
+  }
+
+  Future<UserModel?> getCurrentUserData() async {
+    var userData =
+        await firestore.collection('users').doc(auth.currentUser?.uid).get();
+
+    UserModel? user;
+    if (userData.data() != null) {
+      user = UserModel.fromMap(userData.data()!);
+    }
+    return user;
   }
 }

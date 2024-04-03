@@ -1,17 +1,20 @@
-import 'package:digital_counter/utils/common/loader.dart';
-import 'package:digital_counter/utils/common/utils.dart';
-import 'package:digital_counter/features/home/screens/add_praise_screen_2.dart';
-import 'package:digital_counter/networking/controller/praise_controller.dart';
-import 'package:digital_counter/features/home/screens/update_praise_screen.dart';
-import 'package:digital_counter/utils/theme/app_theme.dart';
-import 'package:digital_counter/utils/theme/pallete.dart';
+import 'package:digital_counter/utils/common/custom_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:digital_counter/features/home/screens/add_praise_screen_2.dart';
+import 'package:digital_counter/features/home/screens/update_praise_screen.dart';
+import 'package:digital_counter/networking/controller/praise_controller.dart';
+import 'package:digital_counter/utils/common/loader.dart';
+import 'package:digital_counter/utils/common/utils.dart';
+import 'package:digital_counter/utils/theme/app_theme.dart';
+import 'package:digital_counter/utils/theme/pallete.dart';
 
 class SavedPraiseScreen extends ConsumerStatefulWidget {
-  const SavedPraiseScreen({super.key});
+  const SavedPraiseScreen({
+    super.key,
+  });
 
   @override
   ConsumerState<SavedPraiseScreen> createState() => _SavedPraiseScreen();
@@ -26,7 +29,7 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          "Prises",
+          "Praises",
           style: Theme.of(context).textTheme.titleLarge,
         ),
         centerTitle: false,
@@ -34,17 +37,67 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
       body: ref.watch(getPraiseFromFirebaseProvider).when(
         data: (data) {
           return data.isEmpty
-              ? const SizedBox(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("There are no Praises"),
-                      SizedBox(height: 10),
-                      Text("Add some praises to view"),
-                    ],
+              ? Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    height: MediaQuery.of(context).size.height * 0.25,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: currentTheme.cardColor,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            "assets/noevent-removebg-preview.png",
+                            height: 100,
+                          ),
+                          Text(
+                            "No Praises so far...",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .copyWith(
+                                    color: currentTheme.dividerColor,
+                                    fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                  builder: (context) =>
+                                      const AddPraiseScreen2(),
+                                ),
+                              );
+                            },
+                            icon: Icon(
+                              CupertinoIcons.add,
+                              color: currentTheme.scaffoldBackgroundColor,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: Pallete.blueColor,
+                              minimumSize: Size(
+                                  MediaQuery.of(context).size.width * 0.3, 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            label: Text(
+                              "Add Here",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: currentTheme.scaffoldBackgroundColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 )
               : Padding(
@@ -93,16 +146,6 @@ class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
                                         ),
                                         Text(
                                           "Target - ${praise.amount.toString()}",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall!
-                                              .copyWith(
-                                                color: currentTheme.primaryColor
-                                                    .withOpacity(0.5),
-                                              ),
-                                        ),
-                                        Text(
-                                          "For ${praise.relation}",
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleSmall!

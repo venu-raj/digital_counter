@@ -1,3 +1,5 @@
+import 'package:digital_counter/utils/common/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:digital_counter/features/testimonis/widgets/comment_card.dart';
@@ -86,14 +88,18 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
             ),
             IconButton.filled(
               onPressed: () {
-                if (commentController.text.trim().isNotEmpty) {
-                  ref.read(testimonisControllerProvider.notifier).postComment(
-                        postId: widget.testimonisModel.id,
-                        text: commentController.text.trim(),
-                        ref: ref,
-                      );
+                if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                  return showSnackBar(context, "Please Login to comment", ref);
+                } else {
+                  if (commentController.text.trim().isNotEmpty) {
+                    ref.read(testimonisControllerProvider.notifier).postComment(
+                          postId: widget.testimonisModel.id,
+                          text: commentController.text.trim(),
+                          ref: ref,
+                        );
 
-                  commentController.text = "";
+                    commentController.text = "";
+                  }
                 }
               },
               color: Pallete.whiteColor,

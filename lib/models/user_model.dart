@@ -3,11 +3,13 @@ class UserModel {
   final String uid;
   final String name;
   final String? profilePic;
+  final bool isAdmin;
   UserModel({
     required this.phoneNumber,
     required this.uid,
     required this.name,
     this.profilePic,
+    this.isAdmin = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -16,7 +18,10 @@ class UserModel {
     result.addAll({'phoneNumber': phoneNumber});
     result.addAll({'uid': uid});
     result.addAll({'name': name});
-    result.addAll({'profilePic': profilePic});
+    if (profilePic != null) {
+      result.addAll({'profilePic': profilePic});
+    }
+    result.addAll({'isAdmin': isAdmin});
 
     return result;
   }
@@ -26,20 +31,8 @@ class UserModel {
       phoneNumber: map['phoneNumber'] ?? '',
       uid: map['uid'] ?? '',
       name: map['name'] ?? '',
-      profilePic: map['profilePic'] ?? '',
-    );
-  }
-
-  UserModel copyWith({
-    String? phoneNumber,
-    String? uid,
-    String? name,
-  }) {
-    return UserModel(
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      uid: uid ?? this.uid,
-      name: name ?? this.name,
-      profilePic: profilePic,
+      profilePic: map['profilePic'],
+      isAdmin: map['isAdmin'] ?? false,
     );
   }
 }

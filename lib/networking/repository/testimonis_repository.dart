@@ -132,9 +132,7 @@ class TestimonisRepository {
     return hashtags;
   }
 
-  Stream<List<TestimonisModel>> getAllTestimonisModelFromFirebase({
-    required String uid,
-  }) {
+  Stream<List<TestimonisModel>> getAllTestimonisModelFromFirebase() {
     try {
       return firestore
           .collection("testimonis")
@@ -157,17 +155,15 @@ class TestimonisRepository {
     required List likes,
     required String uid,
   }) async {
-    try {
-      if (likes.contains(uid)) {
-        await firestore.collection('testimonis').doc(testimonisId).update({
-          'likes': FieldValue.arrayRemove([uid])
-        });
-      } else {
-        await firestore.collection('testimonis').doc(testimonisId).update({
-          'likes': FieldValue.arrayUnion([uid])
-        });
-      }
-    } catch (e) {}
+    if (likes.contains(uid)) {
+      await firestore.collection('testimonis').doc(testimonisId).update({
+        'likes': FieldValue.arrayRemove([uid])
+      });
+    } else {
+      await firestore.collection('testimonis').doc(testimonisId).update({
+        'likes': FieldValue.arrayUnion([uid])
+      });
+    }
   }
 
   // Future<void> commentThePost({

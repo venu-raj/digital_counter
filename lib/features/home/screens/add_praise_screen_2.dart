@@ -15,20 +15,12 @@ class AddPraiseScreen2 extends ConsumerStatefulWidget {
 }
 
 class _AddPraiseScreen2State extends ConsumerState<AddPraiseScreen2> {
-  String dropdownvalue = "Father";
   final amountController = TextEditingController();
-  var items = [
-    'Father',
-    'Mother',
-    'Sister',
-    'Brother',
-    'Friends',
-    '+',
-  ];
-
+  final reasonController = TextEditingController();
   @override
   void dispose() {
     amountController.dispose();
+    reasonController.dispose();
     super.dispose();
   }
 
@@ -38,73 +30,69 @@ class _AddPraiseScreen2State extends ConsumerState<AddPraiseScreen2> {
     return Scaffold(
       appBar: AppBar(),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        // mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const Spacer(flex: 1),
           Text(
-            "To who do you want to send praise",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DropdownButton(
-                value: dropdownvalue,
-                icon: const Icon(Icons.arrow_downward),
-                items: items.map((String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(items),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownvalue = newValue!;
-                  });
-                },
-              ),
-              SizedBox(
-                height: 40,
-                width: MediaQuery.of(context).size.width * 0.40,
-                child: TextField(
-                  controller: amountController,
-                  decoration: InputDecoration(
-                    hintText: "Enter Amount",
-                    focusColor: currentTheme.dividerColor,
-                    hoverColor: currentTheme.dividerColor,
-                  ),
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
+            "Start a new Praise",
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: reasonController,
+              decoration: InputDecoration(
+                hintText: "Praises For",
+                focusColor: currentTheme.dividerColor,
+                hoverColor: currentTheme.dividerColor,
+              ),
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              keyboardType: TextInputType.number,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: amountController,
+              decoration: InputDecoration(
+                hintText: "Praising Count",
+                focusColor: currentTheme.dividerColor,
+                hoverColor: currentTheme.dividerColor,
+              ),
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              keyboardType: TextInputType.number,
+            ),
+          ),
+          const SizedBox(height: 30),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: CustomButton(
               text: "CONTINUE",
               currentTheme: currentTheme,
+              width: MediaQuery.of(context).size.width,
               onpressed: () {
-                if (amountController.text.trim().isNotEmpty) {
+                if (amountController.text.trim().isNotEmpty &&
+                    reasonController.text.trim().isNotEmpty) {
                   Navigator.of(context).push(
                     CupertinoPageRoute(
                       builder: (context) => AddPraiseScreen(
-                        relation: dropdownvalue,
+                        relation: reasonController.text.trim(),
                         amount: amountController.text.trim(),
                       ),
                     ),
                   );
                 } else {
-                  showSnackBar(context, "Please enter valid amount", ref);
+                  showSnackBar(context, "Please fill all the fields", ref);
                 }
               },
             ),
           ),
+          const Spacer(flex: 2),
         ],
       ),
     );

@@ -1,7 +1,9 @@
-import 'package:digital_counter/utils/common/custom_button.dart';
+import 'package:digital_counter/features/auth/screens/login_screen.dart';
 import 'package:digital_counter/features/profile/edit_profile_screen.dart';
+import 'package:digital_counter/utils/common/custom_button.dart';
 import 'package:digital_counter/utils/theme/app_theme.dart';
 import 'package:digital_counter/utils/theme/pallete.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +24,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void logOutUser() {
     ref.read(praiseControllerProvider.notifier).signOutUser();
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+        (route) => false);
   }
 
   @override
@@ -42,52 +49,68 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.name,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+              FirebaseAuth.instance.currentUser!.isAnonymous
+                  ? const SizedBox()
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user.name,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                user.phoneNumber,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          user.phoneNumber,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(user.profilePic!),
+                            radius: 30,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(user.profilePic!),
-                      radius: 30,
-                    ),
-                  ],
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: CustomButton(
-                  text: "Edit Profile",
-                  currentTheme: currentTheme,
-                  onpressed: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => EditProfilescreen(
-                          userModel: user,
-                        ),
+                child: FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? CustomButton(
+                        width: MediaQuery.of(context).size.width,
+                        text: "Sign In",
+                        currentTheme: currentTheme,
+                        onpressed: () {
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (context) => const LoginScreen(),
+                            ),
+                          );
+                        },
+                      )
+                    : CustomButton(
+                        width: MediaQuery.of(context).size.width,
+                        text: "Edit Profile",
+                        currentTheme: currentTheme,
+                        onpressed: () {
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (context) => EditProfilescreen(
+                                userModel: user,
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

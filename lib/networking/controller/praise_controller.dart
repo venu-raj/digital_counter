@@ -6,7 +6,6 @@ import 'package:digital_counter/networking/repository/praise_repository.dart';
 import 'package:digital_counter/features/auth/screens/user_details_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,8 +26,13 @@ final authStateChangeProvider = StreamProvider((ref) {
   return ref.watch(praiseControllerProvider.notifier).authStateChange;
 });
 
-final getUserDataProvider = StreamProvider.family((ref, String uid) {
-  return ref.watch(praiseControllerProvider.notifier).getUserData(uid);
+final getUserDataProvider = StreamProvider((ref) {
+  return ref.watch(praiseControllerProvider.notifier).getUserData();
+});
+
+final userDataAuthProvider = FutureProvider((ref) {
+  final authController = ref.watch(praiseControllerProvider.notifier);
+  return authController.getCurrentUserData();
 });
 
 class PraiseController extends StateNotifier<bool> {
@@ -47,6 +51,27 @@ class PraiseController extends StateNotifier<bool> {
     await praiseRepository.loginWithUser(
       phoneNumber: phoneNumber,
       context: context,
+    );
+  }
+
+  void signInAsGuest({
+    required BuildContext context,
+    required WidgetRef ref,
+  }) async {
+    state = true;
+    final res = await praiseRepository.signInAsGuest();
+    state = false;
+
+    res.fold(
+      (l) => print(l.toString()),
+      (r) => Navigator.of(context).pushAndRemoveUntil(
+        CupertinoPageRoute(
+          builder: (context) => const UserDetailsScreen(
+            nullableName: "Guest",
+          ),
+        ),
+        (route) => false,
+      ),
     );
   }
 
@@ -84,12 +109,15 @@ class PraiseController extends StateNotifier<bool> {
 
     res.fold(
       (l) => showSnackBar(context, l.toString(), ref),
-      (r) => Navigator.of(context).pushAndRemoveUntil(
-        CupertinoPageRoute(
-          builder: (context) => const TabbarScreen(),
-        ),
-        (route) => false,
-      ),
+      (r) {
+        ref.read(userProvider.notifier).update((state) => r);
+        Navigator.of(context).pushAndRemoveUntil(
+          CupertinoPageRoute(
+            builder: (context) => const TabbarScreen(),
+          ),
+          (route) => false,
+        );
+      },
     );
   }
 
@@ -97,8 +125,8 @@ class PraiseController extends StateNotifier<bool> {
     return praiseRepository.getPraiseFromFirebase();
   }
 
-  Stream<UserModel?> getUserData(String uid) {
-    return praiseRepository.getUserData(uid);
+  Stream<UserModel?> getUserData() {
+    return praiseRepository.getUserData();
   }
 
   void uploadPraiseToFirebase({
@@ -120,12 +148,13 @@ class PraiseController extends StateNotifier<bool> {
 
     res.fold(
       (l) => showSnackBar(context, l.toString(), ref),
-      (r) => Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => const TabbarScreen(),
-        ),
-        (route) => false,
-      ),
+      (r) => null,
+      // (r) => Navigator.of(context).pushAndRemoveUntil(
+      //   MaterialPageRoute(
+      //     builder: (context) => const TabbarScreen(),
+      //   ),
+      //   (route) => false,
+      // ),
     );
   }
 
@@ -198,5 +227,10 @@ class PraiseController extends StateNotifier<bool> {
 
   void signOutUser() async {
     praiseRepository.signOutUser();
+  }
+
+  Future<UserModel?> getCurrentUserData() async {
+    UserModel? user = await praiseRepository.getCurrentUserData();
+    return user;
   }
 }

@@ -1,5 +1,6 @@
-import 'package:digital_counter/utils/theme/pallete.dart';
 import 'package:flutter/material.dart';
+
+import 'package:digital_counter/utils/theme/pallete.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -7,11 +8,13 @@ class CustomButton extends StatelessWidget {
     required this.currentTheme,
     required this.onpressed,
     required this.text,
+    required this.width,
   });
 
   final ThemeData currentTheme;
   final VoidCallback onpressed;
   final String text;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,7 @@ class CustomButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         elevation: 0,
         backgroundColor: Pallete.blueColor,
-        minimumSize: Size(MediaQuery.of(context).size.width, 40),
+        minimumSize: Size(width, 40),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -29,7 +32,7 @@ class CustomButton extends StatelessWidget {
         text,
         style: TextStyle(
           fontSize: 14,
-          color: currentTheme.primaryColor,
+          color: currentTheme.scaffoldBackgroundColor,
           fontWeight: FontWeight.w500,
         ),
       ),

@@ -12,10 +12,9 @@ final testimonisControllerProvider =
   );
 });
 
-final getAllTestimonisModelFromFirebaseProvider =
-    StreamProvider.family((ref, String uid) {
+final getAllTestimonisModelFromFirebaseProvider = StreamProvider((ref) {
   final testController = ref.watch(testimonisControllerProvider.notifier);
-  return testController.getAllTestimonisModelFromFirebase(uid: uid);
+  return testController.getAllTestimonisModelFromFirebase();
 });
 
 final getCommentsProvider = StreamProvider.family((ref, String postId) {
@@ -80,10 +79,8 @@ class TestimonisController extends StateNotifier<bool> {
     );
   }
 
-  Stream<List<TestimonisModel>> getAllTestimonisModelFromFirebase({
-    required String uid,
-  }) {
-    return testimonisRepository.getAllTestimonisModelFromFirebase(uid: uid);
+  Stream<List<TestimonisModel>> getAllTestimonisModelFromFirebase() {
+    return testimonisRepository.getAllTestimonisModelFromFirebase();
   }
 
   Future<void> likeThePost({

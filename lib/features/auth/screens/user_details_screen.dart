@@ -1,12 +1,17 @@
-import 'package:digital_counter/utils/common/loader.dart';
-import 'package:digital_counter/utils/common/utils.dart';
-import 'package:digital_counter/networking/controller/praise_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:digital_counter/networking/controller/praise_controller.dart';
+import 'package:digital_counter/utils/common/loader.dart';
+import 'package:digital_counter/utils/common/utils.dart';
+
 class UserDetailsScreen extends ConsumerStatefulWidget {
-  const UserDetailsScreen({super.key});
+  final String? nullableName;
+  const UserDetailsScreen({
+    super.key,
+    this.nullableName,
+  });
 
   @override
   ConsumerState<UserDetailsScreen> createState() => _UserDetailsScreenState();
@@ -14,13 +19,14 @@ class UserDetailsScreen extends ConsumerStatefulWidget {
 
 class _UserDetailsScreenState extends ConsumerState<UserDetailsScreen> {
   late TextEditingController phoneController;
-  final nameController = TextEditingController();
+  late TextEditingController nameController;
 
   @override
   void initState() {
     phoneController = TextEditingController(
       text: FirebaseAuth.instance.currentUser!.phoneNumber.toString(),
     );
+    nameController = TextEditingController(text: widget.nullableName);
     super.initState();
   }
 

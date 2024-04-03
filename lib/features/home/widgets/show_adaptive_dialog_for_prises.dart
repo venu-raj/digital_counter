@@ -27,7 +27,7 @@ Future<dynamic> showAdaptiveDialogForPrises(
                     decoration: const InputDecoration(
                       hintText: 'Enter Name',
                     ),
-                    maxLength: 15,
+                    maxLength: 30,
                   ),
                   Container(
                     width: double.infinity,

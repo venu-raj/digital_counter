@@ -1,6 +1,9 @@
+import 'package:digital_counter/utils/common/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:digital_counter/features/testimonis/screens/comment_screen.dart';
 import 'package:digital_counter/models/testimonis_model.dart';
@@ -21,6 +24,15 @@ class TestimonisCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTheme = ref.watch(themeNotifierProvider);
     final user = ref.watch(userProvider)!;
+
+    Future<void> sharToWhatsApp() async {
+      final box = context.findRenderObject() as RenderBox?;
+      return await Share.share(
+        "${testimonisModel.imageLinks}\n${testimonisModel.text}",
+        subject: "",
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +61,6 @@ class TestimonisCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.45,
                     width: MediaQuery.of(context).size.width,
                     child: Image.network(
                       testimonisModel.imageLinks,
@@ -58,7 +69,7 @@ class TestimonisCard extends ConsumerWidget {
                           ImageChunkEvent? loadingProgress) {
                         if (loadingProgress != null) {
                           return SizedBox(
-                            height: 250,
+                            height: MediaQuery.of(context).size.height * 0.4,
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: currentTheme.primaryColor,
@@ -102,11 +113,18 @@ class TestimonisCard extends ConsumerWidget {
               children: [
                 IconButton(
                   onPressed: () {
-                    ref.read(testimonisControllerProvider.notifier).likeThePost(
-                          testimonisId: testimonisModel.id,
-                          likes: testimonisModel.likes,
-                          uid: user.uid,
-                        );
+                    if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                      return showSnackBar(context,
+                          "Please Login to like the testimonials", ref);
+                    } else {
+                      ref
+                          .read(testimonisControllerProvider.notifier)
+                          .likeThePost(
+                            testimonisId: testimonisModel.id,
+                            likes: testimonisModel.likes,
+                            uid: user.uid,
+                          );
+                    }
                   },
                   icon: testimonisModel.likes.contains(user.uid)
                       ? Icon(
@@ -134,7 +152,14 @@ class TestimonisCard extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                      return showSnackBar(context,
+                          "Please Login to share the testimonials", ref);
+                    } else {
+                      sharToWhatsApp();
+                    }
+                  },
                   icon: Icon(
                     CupertinoIcons.share,
                     color: currentTheme.primaryColor,
