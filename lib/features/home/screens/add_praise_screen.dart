@@ -1,8 +1,10 @@
+import 'package:digital_counter/features/home/screens/how_to_add_praise_screen.dart';
 import 'package:digital_counter/features/home/screens/tabbar_screen.dart';
 import 'package:digital_counter/utils/common/custom_button.dart';
 import 'package:digital_counter/features/home/widgets/show_adaptive_dialog_for_prises.dart';
 import 'package:digital_counter/utils/theme/app_theme.dart';
 import 'package:digital_counter/utils/theme/pallete.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:digital_counter/utils/common/utils.dart';
@@ -53,7 +55,20 @@ class _AddPraiseScreenState extends ConsumerState<AddPraiseScreen> {
     final currentTheme = ref.watch(themeNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => const HowToAddPraiseScreen(),
+                ),
+              );
+            },
+            child: const Text("See How to Praise"),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [

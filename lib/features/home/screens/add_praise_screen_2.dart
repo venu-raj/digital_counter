@@ -51,7 +51,7 @@ class _AddPraiseScreen2State extends ConsumerState<AddPraiseScreen2> {
                 hoverColor: currentTheme.dividerColor,
               ),
               maxLengthEnforcement: MaxLengthEnforcement.enforced,
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
             ),
           ),
           const SizedBox(height: 10),

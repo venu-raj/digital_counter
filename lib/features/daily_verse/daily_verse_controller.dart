@@ -31,15 +31,15 @@ class DailyVerseProvider extends StateNotifier<bool> {
     res.fold((l) => print(l.toString()), (r) => null);
   }
 
-  void delectVerse({
-    required String desc,
-    required String docId,
-  }) async {
-    return dailyVerseRepository.delectVerse(
-      desc: desc,
-      docId: docId,
-    );
-  }
+  // void delectVerse({
+  //   required String desc,
+  //   required String docId,
+  // }) async {
+  //   return dailyVerseRepository.delectVerse(
+  //     desc: desc,
+  //     docId: docId,
+  //   );
+  // }
 
   Stream<List<DailyVerseModel?>> getDocuments() {
     return dailyVerseRepository.getDocuments();

@@ -1,4 +1,3 @@
-import 'package:digital_counter/features/daily_verse/daily_verse_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +28,6 @@ class _TabbarScreenState extends ConsumerState<TabbarScreen> {
         children: const [
           SavedPraiseScreen(),
           TestmonisFeedScreen(),
-          DailyVerseScreen(),
           ProfileScreen(),
         ],
       ),
@@ -68,17 +66,6 @@ class _TabbarScreenState extends ConsumerState<TabbarScreen> {
           ),
           BottomNavigationBarItem(
             icon: index == 2
-                ? Icon(
-                    Icons.menu_book_rounded,
-                    color: currentTheme.primaryColor,
-                  )
-                : Icon(
-                    Icons.menu_book_rounded,
-                    color: currentTheme.dividerColor,
-                  ),
-          ),
-          BottomNavigationBarItem(
-            icon: index == 3
                 ? Icon(
                     CupertinoIcons.person_crop_circle_fill,
                     color: currentTheme.primaryColor,

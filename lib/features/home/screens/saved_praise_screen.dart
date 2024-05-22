@@ -1,4 +1,4 @@
-import 'package:digital_counter/utils/common/custom_button.dart';
+import 'package:digital_counter/features/daily_verse/daily_verse_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,8 +22,43 @@ class SavedPraiseScreen extends ConsumerStatefulWidget {
 
 class _SavedPraiseScreen extends ConsumerState<SavedPraiseScreen> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentTheme = ref.watch(themeNotifierProvider);
+
+    // Show a dialog when the widget builds
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.watch(getDocumentsProvider).when(
+            data: (data) {
+              return data.isEmpty
+                  ? null
+                  : showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Today\'s Verse!'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Close"))
+                        ],
+                        content: Text(data.first?.desc ?? ""),
+                      ),
+                    );
+            },
+            error: (err, trace) {
+              return Center(
+                child: Text(err.toString()),
+              );
+            },
+            loading: () => const LoadingPage(),
+          );
+    });
 
     return Scaffold(
       appBar: AppBar(

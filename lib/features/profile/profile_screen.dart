@@ -1,6 +1,9 @@
 import 'package:digital_counter/features/auth/screens/login_screen.dart';
+import 'package:digital_counter/features/daily_verse/daily_verse_controller.dart';
 import 'package:digital_counter/features/profile/edit_profile_screen.dart';
 import 'package:digital_counter/utils/common/custom_button.dart';
+import 'package:digital_counter/utils/common/loader.dart';
+import 'package:digital_counter/utils/common/utils.dart';
 import 'package:digital_counter/utils/theme/app_theme.dart';
 import 'package:digital_counter/utils/theme/pallete.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +23,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   void toggleTheme() {
     ref.read(themeNotifierProvider.notifier).toggleTheme();
+  }
+
+  final dailyVerseController = TextEditingController();
+
+  @override
+  void dispose() {
+    dailyVerseController.dispose();
+    super.dispose();
   }
 
   void logOutUser() {
@@ -183,6 +194,112 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     ),
                   ),
+                  user.isAdmin
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Column(
+                            children: [
+                              TextField(
+                                controller: dailyVerseController,
+                                decoration: InputDecoration(
+                                  hintText: "Add a New Verse",
+                                  focusColor: currentTheme.dividerColor,
+                                  border: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                  ),
+                                  hoverColor: currentTheme.dividerColor,
+                                ),
+                                maxLines: null,
+                                keyboardType: TextInputType.text,
+                              ),
+                              const SizedBox(height: 10),
+                              CustomButton(
+                                width: MediaQuery.of(context).size.width,
+                                text: "UPLOAD",
+                                currentTheme: currentTheme,
+                                onpressed: () {
+                                  if (dailyVerseController.text.isNotEmpty) {
+                                    ref
+                                        .read(dailyVerseProvider.notifier)
+                                        .uploadDailyVerseToFirebase(
+                                          desc:
+                                              dailyVerseController.text.trim(),
+                                          docId: user.uid,
+                                        );
+
+                                    dailyVerseController.text = "";
+                                    setState(() {});
+                                  } else {
+                                    showSnackBar(context,
+                                        "Enter Verse Description", ref);
+                                  }
+                                },
+                              ),
+                              SizedBox(
+                                height: 100,
+                                child: ref.watch(getDocumentsProvider).when(
+                                      data: (data) {
+                                        return data.isEmpty
+                                            ? Text(
+                                                "There are no Verse Added yet.",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium,
+                                              )
+                                            : Center(
+                                                child: ListView.builder(
+                                                  itemCount: data.length,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemBuilder: (context, i) {
+                                                    return Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          "Today's Verse : ",
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        Text(
+                                                          data[i]!
+                                                              .desc
+                                                              .toString(),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyMedium,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                      },
+                                      error: (err, trace) {
+                                        return Center(
+                                          child: Text(err.toString()),
+                                        );
+                                      },
+                                      loading: () => const LoadingPage(),
+                                    ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox(),
                 ],
               )
             ],
